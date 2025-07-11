@@ -4,28 +4,11 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
-/* definicion de la base de datos */
-const blogSchema = new mongoose.Schema({
-  title: String,
-  author: String,
-  url: String,
-  likes: Number
-})
+const Blog = require('./models/blog')
+
+mongoose.connect(config.MONGODB_URI)
 
 
-const Blog = mongoose.model('Blog', blogSchema)
-
-const mongoUrl = config.MONGODB_URI
-console.log(mongoUrl)
-mongoose.connect(mongoUrl)
-
-blogSchema.set('toJSON',{
-    transform: (document,returnedObject)=>{
-        returnedObject.id = returnedObject._id.toString()
-        delete returnedObject._id
-        delete returnedObject.__v
-    }
-})
 app.use(cors())
 app.use(express.json())
 
