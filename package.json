@@ -1,0 +1,23 @@
+{
+  "name": "backendlistablogs",
+  "version": "1.0.0",
+  "description": "back end de una lista de blogs",
+  "license": "ISC",
+  "author": "Leonel Costamagna",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
