@@ -48,40 +48,52 @@ const inicialBlogs = [
 
   }  
 ]
+  beforeEach(async()=>{
+    await Blog.deleteMany({})
+    const blogObjects = inicialBlogs.map(blog=> new Blog(blog))
+    const promiseArray = blogObjects.map(blog => blog.save())
+    await Promise.all(promiseArray)
+  })
 
-beforeEach(async()=>{
-  await Blog.deleteMany({})
-  const blogObjects = inicialBlogs.map(blog=> new Blog(blog))
-  const promiseArray = blogObjects.map(blog => blog.save())
-  await Promise.all(promiseArray)
-})
+  test('blogs are return as json', async()=>{
+      await api
+      .get('/api/blogs')
+      .expect('Content-Type',/application\/json/)
+  })
 
-test('blogs are return as json', async()=>{
-    await api
-    .get('/api/blogs')
-    .expect('Content-Type',/application\/json/)
-})
+  test('the correct amount of blogs is return',async()=>{
 
-test('the correct amount of blogs is return',async()=>{
+    const response = await api.get('/api/blogs')
+    
+    assert.strictEqual(response.body.length, inicialBlogs.length)
+  })
 
-  const response = await api.get('/api/blogs')
-  
-  assert.strictEqual(response.body.length, inicialBlogs.length)
-})
+  test('the blog id property exists',async()=>{
+    
+     const blogs = await Blog.find({});
+    const blogsJSON = blogs.map(blog => blog.toJSON());
 
-test('the blog id property exists',async()=>{
-  
-  const blogs = await Blog.find({});
-  const blogsJSON = blogs.map(blog => blog.toJSON())
+    for (const blog of blogsJSON) {
+      assert.ok(blog.id, 'The blog must have id property')
+      assert.strictEqual(typeof blog.id, 'string')
+      assert.strictEqual(blog._id, undefined, 'Must not have _id property')
+      assert.strictEqual(blog.__v, undefined, 'Must not have __v property')
+    }
+  })
+  test('a new blog is added', async () => {
+    const newBlog = {
+          title: "React patterns",
+          author: "Leonel",
+          url: "https://reactpatterns.com/",
+          likes: 7
+        }
+    const blog = new Blog(newBlog)
+    await blog.save()
 
-  for (const blog of blogsJSON) {
-    assert.ok(blog.id, 'The blog must have id property')
-    assert.strictEqual(typeof blog.id, 'string')
-    assert.strictEqual(blog._id, undefined, 'Must not have _id property')
-    assert.strictEqual(blog.__v, undefined, 'Must not have __v property')
-  }
-})
 
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.body.length, inicialBlogs.length + 1)
+  })
 after(async()=>{
     await mongoose.connection.close()
 })
